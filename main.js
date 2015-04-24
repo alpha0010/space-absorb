@@ -23,11 +23,15 @@ main.Init = function() {
     main.projector = new THREE.Projector();
     main.raycaster = new THREE.Raycaster();
     main.mouse = new THREE.Vector3();
+    main.pickingScene = new THREE.Scene();
+    main.pickingTexture = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight );
+    main.pickingTexture.minFilter = THREE.LinearFilter;
+    main.pickingTexture.generateMipmaps = false;
 
     $("#btnFullscr").click(main.OnFullscr);
     $(window).resize($.throttle(300, main.OnResize));
     document.addEventListener( 'mousemove', main.OnMouseMove, false );
-    visu.Init(main.scene);
+    visu.Init(main.scene, main.pickingScene);
     phys.Init(main.scene.children[0]);
     main.Render();  
 }
@@ -47,8 +51,9 @@ main.OnMouseMove = function(event) {
     
     main.mouse.unproject(main.camera);
     main.raycaster.set(main.camera.position, main.mouse.sub(main.camera.position).normalize());
-    var intersects = main.raycaster.intersectObjects(main.scene.children[1].children);
-    
+    var intersects = main.raycaster.intersectObjects(main.pickingScene.children);
+
+    //intersects[intersects.length-1].object.material.color.setRGB(0,255,0);
     intersects.forEach(function(intersection){
         intersection.object.material.color.setRGB(0,255,0);
     });
@@ -72,4 +77,5 @@ main.Render = function() {
     requestAnimationFrame(main.Render);
     phys.Update(main.clock.getDelta());
     main.renderer.render(main.scene, main.camera);
+    main.renderer.render(main.pickingScene, main.camera, main.pickingTexture);
 }

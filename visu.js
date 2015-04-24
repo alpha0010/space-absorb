@@ -1,6 +1,6 @@
 var visu = {};
 
-visu.Init = function(scene) {
+visu.Init = function(scene, pickingScene) {
     var geom = new THREE.BoxGeometry(0.1, 0.1, 0.1);
     var mat  = new THREE.MeshLambertMaterial({color: 0x00ff00});
     var cubes = new THREE.Object3D();
@@ -12,7 +12,9 @@ visu.Init = function(scene) {
         cubes.add(cube);
     }      
     planets = new THREE.Object3D();
+    pickingPlanets = new THREE.Object3D();
     scene.add(planets); // scene.children[1]
+    
 
     for(var i=0; i<10; i++){
         var planetSize = 0.5;
@@ -20,11 +22,14 @@ visu.Init = function(scene) {
         var geometry = new THREE.SphereGeometry( planetSize, 32, 32 );
         var material = new THREE.MeshBasicMaterial( {color: planetColor} );
         var planet = new THREE.Mesh(geometry,material);
-        planet.planetSize = planetSize;
-        planet.planetColor = planetColor;
         planet.position.set(randInt(-5,5),randInt(-5,5),randInt(-5,5));
+        var pickingGeometry = new THREE.SphereGeometry( planetSize*2, 32, 32 );
+        var pickingPlanet = new THREE.Mesh(pickingGeometry,material);
+        pickingPlanet.position.set(planet.position.x, planet.position.y, planet.position.z);
         //planet.id = i;
         planets.add(planet);
+        pickingScene.add(pickingPlanet);
+        
 
         /*var textGeom = new THREE.TextGeometry(randInt(1,50), {
             size: 10,
