@@ -66,7 +66,7 @@ main.OnFullscr = function() {
 
 main.OnKeyDown = function(event) {
     if(event.keyCode == 32){
-        event.stopPropagation();
+        event.preventDefault();
         main.selectedUnits.forEach(function (unit){
             unit.material.color.setStyle(unit.originalColor);
         });
@@ -107,7 +107,7 @@ main.OnMouseMove = function(event) {
             intersects[0].object.material.color.setRGB(0,255,0);
             main.selectedPlanet = intersects[0].object;
         } else main.selectedPlanet = null;
-    } else if(main.selectedPlanet){
+    } else if(main.selectedPlanet && event.button == 0){
         
         var dir = main.mouse.sub( main.camera.position ).normalize();
         var distance = - (main.camera.position.z-main.selectedPlanet.position.z) / dir.z;
