@@ -8,6 +8,12 @@ function randInt(a,b){
     return a + parseInt(Math.random()*(b-a+1));
 }
 
+main.Animate = function() {
+    requestAnimationFrame( main.Animate );
+    main.controls.update();
+    main.Render();
+}
+
 main.Init = function() {
     main.width    = $("#ruler")[0].clientWidth;
     main.height   = main.width * 9 / 16;
@@ -31,20 +37,41 @@ main.Init = function() {
     main.selectedPlanet;
     main.selectedUnits = [];
     
+    main.controls = new THREE.TrackballControls( main.camera, main.renderer.domElement);
+    main.controls.rotateSpeed = 2.5;
+    main.controls.zoomSpeed = 3;
+    main.controls.panSpeed = 0.8;
+    main.controls.noZoom = false;
+    main.controls.noPan = false;
+    main.controls.staticMoving = true;
+    main.controls.addEventListener( 'change', main.Render );
+    main.controls.keys = [ 0, 83, 65, 68 ];
+    
 
     $("#btnFullscr").click(main.OnFullscr);
     $(window).resize($.throttle(300, main.OnResize));
     document.addEventListener('mousemove', main.OnMouseMove, false);
     document.addEventListener('mousedown', main.OnMouseDown, false);
     document.addEventListener('mouseup', main.OnMouseUp, false);
+    document.addEventListener('keydown', main.OnKeyDown, false);
     main.mouseDown = false;
     visu.Init(main.scene, main.pickingScene);
     phys.Init(main.scene.children[0]);
-    main.Render();  
+    main.Animate();  
 }
 
 main.OnFullscr = function() {
     $("#canvas").fullScreen(true);
+}
+
+main.OnKeyDown = function(event) {
+    if(event.keyCode == 32){
+        event.stopPropagation();
+        main.selectedUnits.forEach(function (unit){
+            unit.material.color.setStyle(unit.originalColor);
+        });
+        main.selectedUnits = [];
+    }
 }
 
 main.OnMouseDown = function(event){
@@ -79,7 +106,7 @@ main.OnMouseMove = function(event) {
         if(intersects[0]){
             intersects[0].object.material.color.setRGB(0,255,0);
             main.selectedPlanet = intersects[0].object;
-        }
+        } else main.selectedPlanet = null;
     } else if(main.selectedPlanet){
         
         var dir = main.mouse.sub( main.camera.position ).normalize();
@@ -103,11 +130,9 @@ main.OnMouseMove = function(event) {
             }
         });
     }
-    
-    //$('#test').text(scale+" x "+pos.x+"  "+main.selectedPlanet.position.x+" y "+pos.y+"  "+main.selectedPlanet.position.y+" z "+pos.z+"  "+main.selectedPlanet.position.z );
 }
 
-main.OnMouseUp = function(event){
+main.OnMouseUp = function(event) {
     main.mouseDown = false;
     var selectionSphere = main.scene.children[2];
     selectionSphere.material.opacity = 0.0;
@@ -126,10 +151,12 @@ main.OnResize = function() {
     main.camera.aspect = main.width / main.height;
     main.camera.updateProjectionMatrix();
     main.renderer.setSize(main.width, main.height);
+    main.controls.handleResize();
 }
 
+
+
 main.Render = function() {
-    requestAnimationFrame(main.Render);
     phys.Update(main.clock.getDelta());
     main.renderer.render(main.scene, main.camera);
     main.renderer.render(main.pickingScene, main.camera, main.pickingTexture);
