@@ -54,8 +54,9 @@ main.Init = function() {
     $(document).mouseup(main.OnMouseUp);
     $(document).keydown(main.OnKeyDown);
     main.mouseDown = false;
+    main.didDrag   = false;
     visu.Init(main.scene, main.pickingScene);
-    phys.Init(main.scene.children[0]);
+    phys.Init(main.scene.children[0], main.scene.children[1]);
     main.Animate();  
 }
 
@@ -74,8 +75,11 @@ main.OnKeyDown = function(event) {
 }
 
 main.OnMouseDown = function(event) {
-    main.mouseDown = true;
     event.preventDefault();
+    if (event.which != 1) // only want left click
+        return;
+    main.mouseDown = true;
+    main.didDrag   = false;
     var offset = $("#canvas").offset();
     main.mouseOrig.x = (event.pageX - offset.left)/main.width * 2 - 1;
     main.mouseOrig.y = -(event.pageY - offset.top)/main.height * 2 + 1;
@@ -107,6 +111,7 @@ main.OnMouseMove = function(event) {
             main.selectedPlanet = null;
     }
     else if (main.selectedPlanet && event.button == 0) {
+        main.didDrag = true;
         var dir = main.mouse.sub( main.camera.position ).normalize();
         var distance = - (main.camera.position.z-main.selectedPlanet.position.z) / dir.z;
         var pos = main.camera.position.clone().add( dir.multiplyScalar( distance ) );
@@ -131,7 +136,11 @@ main.OnMouseMove = function(event) {
 }
 
 main.OnMouseUp = function(event) {
+    if (event.which != 1)
+        return;
     main.mouseDown = false;
+    if (main.selectedPlanet && !main.didDrag)
+        phys.GoTo(main.selectedUnits, main.selectedPlanet.position);
     var selectionSphere = main.scene.children[2];
     selectionSphere.material.opacity = 0.0;
     main.selectedPlanet = null;
@@ -151,8 +160,6 @@ main.OnResize = function() {
     main.renderer.setSize(main.width, main.height);
     main.controls.handleResize();
 }
-
-
 
 main.Render = function() {
     phys.Update(main.clock.getDelta());

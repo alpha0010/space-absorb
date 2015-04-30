@@ -1,8 +1,15 @@
 var phys = {};
 
-phys.Init = function(scene) {
-    phys.objs = scene.children;
-    phys.dest = new THREE.Vector3(Math.random()*4-2, Math.random()*2-1, Math.random()*4-2);
+phys.Init = function(unitGroup, planetGroup) {
+    phys.objs    = unitGroup.children;
+    phys.planets = planetGroup.children;
+    phys.dest    = new THREE.Vector3(Math.random()*4-2, Math.random()*2-1, Math.random()*4-2);
+}
+
+phys.GoTo = function(units, destination) {
+    for (var i = 0; i < units.length; ++i) {
+        units[i].dest = destination;
+    }
 }
 
 phys.Update = function(delta) {
@@ -13,7 +20,9 @@ phys.Update = function(delta) {
 
         if (!obj.velocity)
             obj.velocity = new THREE.Vector3();
-        var dir = phys.dest.clone().sub(obj.position).normalize();
+        if (!obj.dest)
+            obj.dest = phys.dest
+        var dir = obj.dest.clone().sub(obj.position).normalize();
         obj.velocity.add(dir.divideScalar(8));
 
         for (var j = 0; j < phys.objs.length; ++j) {
@@ -23,6 +32,13 @@ phys.Update = function(delta) {
             dir = objB.position.clone().sub(obj.position).normalize();
             var distSq = Math.max(1e-10, obj.position.distanceToSquared(objB.position));
             obj.velocity.sub(dir.divideScalar(distSq * 600));
+        }
+
+        for (var j = 0; j < phys.planets.length; ++j) {
+            var planet = phys.planets[j];
+            dir = planet.position.clone().sub(obj.position).normalize();
+            var distSq = Math.max(1e-10, obj.position.distanceToSquared(planet.position));
+            obj.velocity.sub(dir.divideScalar(distSq * 20));
         }
 
         obj.velocity.sub( obj.velocity.clone()
