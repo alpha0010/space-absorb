@@ -27,33 +27,32 @@ main.Init = function() {
     main.scene = new THREE.Scene();
     main.clock = new THREE.Clock();
     main.raycaster = new THREE.Raycaster();
-    main.mouse = new THREE.Vector3();
+    main.mouse     = new THREE.Vector3();
     main.mouseOrig = new THREE.Vector3();
-    main.pickingScene = new THREE.Scene();
+    main.pickingScene   = new THREE.Scene();
     main.pickingTexture = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight);
     main.pickingTexture.minFilter = THREE.LinearFilter;
     main.pickingTexture.generateMipmaps = false;
     main.selected = [];
     main.selectedPlanet;
     main.selectedUnits = [];
-    
-    main.controls = new THREE.TrackballControls( main.camera, main.renderer.domElement);
+
+    main.controls = new THREE.TrackballControls(main.camera, main.renderer.domElement);
     main.controls.rotateSpeed = 2.5;
-    main.controls.zoomSpeed = 3;
-    main.controls.panSpeed = 0.8;
+    main.controls.zoomSpeed   = 3;
+    main.controls.panSpeed    = 0.8;
     main.controls.noZoom = false;
-    main.controls.noPan = false;
+    main.controls.noPan  = false;
     main.controls.staticMoving = true;
     main.controls.addEventListener( 'change', main.Render );
     main.controls.keys = [ 0, 83, 65, 68 ];
-    
 
     $("#btnFullscr").click(main.OnFullscr);
     $(window).resize($.throttle(300, main.OnResize));
-    document.addEventListener('mousemove', main.OnMouseMove, false);
-    document.addEventListener('mousedown', main.OnMouseDown, false);
-    document.addEventListener('mouseup', main.OnMouseUp, false);
-    document.addEventListener('keydown', main.OnKeyDown, false);
+    $(document).mousemove(main.OnMouseMove);
+    $(document).mousedown(main.OnMouseDown);
+    $(document).mouseup(main.OnMouseUp);
+    $(document).keydown(main.OnKeyDown);
     main.mouseDown = false;
     visu.Init(main.scene, main.pickingScene);
     phys.Init(main.scene.children[0]);
@@ -65,68 +64,67 @@ main.OnFullscr = function() {
 }
 
 main.OnKeyDown = function(event) {
-    if(event.keyCode == 32){
+    if (event.keyCode == 32) {
         event.preventDefault();
-        main.selectedUnits.forEach(function (unit){
+        main.selectedUnits.forEach(function(unit) {
             unit.material.color.setStyle(unit.originalColor);
         });
         main.selectedUnits = [];
     }
 }
 
-main.OnMouseDown = function(event){
+main.OnMouseDown = function(event) {
     main.mouseDown = true;
     event.preventDefault();
     var offset = $("#canvas").offset();
-    main.mouseOrig.x = (event.pageX - offset.left)/main.width *2 - 1;
-    main.mouseOrig.y = -(event.pageY - offset.top)/main.height *2 + 1;
-    if(main.selectedPlanet){
+    main.mouseOrig.x = (event.pageX - offset.left)/main.width * 2 - 1;
+    main.mouseOrig.y = -(event.pageY - offset.top)/main.height * 2 + 1;
+    if (main.selectedPlanet) {
         var pos = main.selectedPlanet.position;
         main.scene.children[2].position.copy(pos);
     }
-    
 }
 
 main.OnMouseMove = function(event) {
     var offset = $("#canvas").offset();
-    main.mouse.x = (event.pageX - offset.left)/main.width *2 - 1;
-    main.mouse.y = -(event.pageY - offset.top)/main.height *2 + 1;
-    main.mouse.unproject( main.camera );
-    
-    
-    if (!main.mouseDown){
-        main.scene.children[1].children.forEach(function(planet){
-            planet.material.color.setRGB(0,0,255);
+    main.mouse.x = (event.pageX - offset.left)/main.width * 2 - 1;
+    main.mouse.y = -(event.pageY - offset.top)/main.height * 2 + 1;
+    main.mouse.unproject(main.camera);
+
+    if (!main.mouseDown) {
+        main.scene.children[1].children.forEach(function(planet) {
+            planet.material.color.setRGB(0, 0, 255);
         });
-        
-        
+
         main.raycaster.set(main.camera.position, main.mouse.sub(main.camera.position).normalize());
         var intersects = main.raycaster.intersectObjects(main.pickingScene.children);
 
-        if(intersects[0]){
-            intersects[0].object.material.color.setRGB(0,255,0);
+        if (intersects[0]) {
+            intersects[0].object.material.color.setRGB(0, 255, 0);
             main.selectedPlanet = intersects[0].object;
-        } else main.selectedPlanet = null;
-    } else if(main.selectedPlanet && event.button == 0){
-        
+        }
+        else
+            main.selectedPlanet = null;
+    }
+    else if (main.selectedPlanet && event.button == 0) {
         var dir = main.mouse.sub( main.camera.position ).normalize();
         var distance = - (main.camera.position.z-main.selectedPlanet.position.z) / dir.z;
         var pos = main.camera.position.clone().add( dir.multiplyScalar( distance ) );
-        
+
         var selectionSphere = main.scene.children[2];
         selectionSphere.material.opacity = 1.0;
         var scale = Math.max(scale = pos.distanceTo(main.selectedPlanet.position),0.51);
-        
+
         selectionSphere.scale.set(scale,scale,scale);
-        
-        main.selectedUnits.forEach(function (unit){
+
+        main.selectedUnits.forEach(function(unit) {
             unit.material.color.setStyle(unit.originalColor);
         });
         main.selectedUnits = [];
-        main.scene.children[0].children.forEach(function(unit){
-            if (unit.position.distanceTo(selectionSphere.position)<scale){
+        main.scene.children[0].children.forEach(function(unit) {
+            if (unit.position.distanceTo(selectionSphere.position) < scale) {
                 main.selectedUnits.push(unit);
-                unit.material.color.setRGB(255,0,0);
+                unit.material.color.setRGB(255, 0, 0);
             }
         });
     }
