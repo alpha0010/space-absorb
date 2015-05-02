@@ -60,6 +60,8 @@ main.Init = function() {
     phys.Init(main.scene.children[0], main.scene.children[1]);
     main.Animate();  
     window.setInterval(function(){visu.AddUnits(main.scene)},10000);
+    // alternate phys update line
+    //window.setInterval(function(){phys.Update(main.clock.getDelta())},30);
 }
 
 main.OnFullscr = function() {
@@ -169,6 +171,25 @@ main.OnResize = function() {
 
 main.Render = function() {
     phys.Update(main.clock.getDelta());
+    main.UpdatePlanets();
     main.renderer.render(main.scene, main.camera);
     main.renderer.render(main.pickingScene, main.camera, main.pickingTexture);
+}
+
+main.UpdatePlanets = function() {
+    main.scene.children[1].children.forEach(function(planet){
+        var humanCount = 0;
+        var neutralCount = 0;
+        main.scene.children[0].children.forEach(function (unit){
+            if(unit.position.distanceTo(planet.position) < 1){
+                if(unit.player == "human" ) humanCount++;
+                else neutralCount++;
+            }
+        });
+        var newOwner = (humanCount >= neutralCount)?"human":"neutral";
+        if(planet.player != newOwner){
+            planet.player = newOwner;
+            planet.material.color.setHex(planet.color = (newOwner=="human")?0x0000FF:0x999999);
+        }
+    });
 }
