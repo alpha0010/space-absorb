@@ -36,6 +36,7 @@ main.Init = function() {
     main.selected = [];
     main.selectedPlanet;
     main.selectedUnits = [];
+    main.dontDrag = true;
 
     main.controls = new THREE.TrackballControls(main.camera, main.renderer.domElement);
     main.controls.rotateSpeed = 2.5;
@@ -58,6 +59,7 @@ main.Init = function() {
     visu.Init(main.scene, main.pickingScene);
     phys.Init(main.scene.children[0], main.scene.children[1]);
     main.Animate();  
+    window.setInterval(function(){visu.AddUnits(main.scene)},10000);
 }
 
 main.OnFullscr = function() {
@@ -80,9 +82,11 @@ main.OnMouseDown = function(event) {
         return;
     main.mouseDown = true;
     main.didDrag   = false;
+    main.dontDrag  = true;
     var offset = $("#canvas").offset();
     main.mouseOrig.x = (event.pageX - offset.left)/main.width * 2 - 1;
     main.mouseOrig.y = -(event.pageY - offset.top)/main.height * 2 + 1;
+    main.mouseOrig.z = 0;
     if (main.selectedPlanet) {
         var pos = main.selectedPlanet.position;
         main.scene.children[2].position.copy(pos);
@@ -93,11 +97,13 @@ main.OnMouseMove = function(event) {
     var offset = $("#canvas").offset();
     main.mouse.x = (event.pageX - offset.left)/main.width * 2 - 1;
     main.mouse.y = -(event.pageY - offset.top)/main.height * 2 + 1;
+    main.mouse.z = 0;
+    main.dontDrag = main.mouse.distanceTo(main.mouseOrig) < 0.05 && main.dontDrag;
     main.mouse.unproject(main.camera);
 
     if (!main.mouseDown) {
         main.scene.children[1].children.forEach(function(planet) {
-            planet.material.color.setRGB(0, 0, 255);
+            planet.material.color.setHex(planet.color);
         });
 
         main.raycaster.set(main.camera.position, main.mouse.sub(main.camera.position).normalize());
@@ -110,7 +116,7 @@ main.OnMouseMove = function(event) {
         else
             main.selectedPlanet = null;
     }
-    else if (main.selectedPlanet && event.button == 0) {
+    else if (main.selectedPlanet && event.button == 0 && !main.dontDrag ) {
         main.didDrag = true;
         var dir = main.mouse.sub( main.camera.position ).normalize();
         var distance = - (main.camera.position.z-main.selectedPlanet.position.z) / dir.z;
@@ -123,11 +129,11 @@ main.OnMouseMove = function(event) {
         selectionSphere.scale.set(scale,scale,scale);
 
         main.selectedUnits.forEach(function(unit) {
-            unit.material.color.setStyle(unit.originalColor);
+            unit.material.color.setHex(unit.originalColor);
         });
         main.selectedUnits = [];
         main.scene.children[0].children.forEach(function(unit) {
-            if (unit.position.distanceTo(selectionSphere.position) < scale) {
+            if (unit.player == "human" && unit.position.distanceTo(selectionSphere.position) < scale) {
                 main.selectedUnits.push(unit);
                 unit.material.color.setRGB(255, 0, 0);
             }
