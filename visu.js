@@ -1,22 +1,5 @@
 var visu = {};
 
-visu.AddUnits = function (scene){
-    var geom = new THREE.BoxGeometry(0.1, 0.1, 0.1);
-    scene.children[1].children.forEach(function(planet){
-            var color = (planet.player == "human")?0x00FF00:0xFFFF00;
-            var mat  = new THREE.MeshLambertMaterial({color: color});
-            var cube = new THREE.Mesh(geom, mat);
-            cube.position.copy(planet.position);
-            cube.position.x += Math.random()*2 - 1;
-            cube.position.y += Math.random()*2 - 1;
-            cube.rotation.z += Math.random()*2 - 1;
-            cube.player = planet.player;
-            cube.originalColor = color;
-            scene.children[0].add(cube);
-            phys.GoTo([cube], planet.position);
-    });
-};
-
 visu.Init = function(scene, pickingScene) {
     var geom = new THREE.BoxGeometry(0.1, 0.1, 0.1);
     var cubes = new THREE.Object3D();
@@ -50,8 +33,8 @@ visu.Init = function(scene, pickingScene) {
         var material = new THREE.MeshBasicMaterial({color: planetColor});
         var planet   = new THREE.Mesh(geometry,material);
         planet.position.set(randInt(-10,10), randInt(-5,5), randInt(-5,5));
-        planet.player = (i<5)?"human":"neutral";
-        planet.color = (planet.player == "human")?0x0000FF:0x999999;
+        planet.player = (i<5) ? "human" : "neutral";
+        planet.color = (planet.player == "human") ? 0x0000FF : 0x999999;
         planet.material.color.setHex(planet.color);
         var pickingGeometry = new THREE.SphereGeometry(planetSize*2, 32, 32);
         var pickingPlanet   = new THREE.Mesh(pickingGeometry,material);
@@ -69,7 +52,7 @@ visu.Init = function(scene, pickingScene) {
         mesh.position.set(planet.position.x-5,planet.position.y+15,planet.position.z)
         scene.add( mesh );*/
         for (var j = 0; j < 3; ++j) {
-            var color = (planet.player == "human")?0x00FF00:0xFFFF00;
+            var color = (planet.player == "human") ? 0x00FF00 : 0xFFFF00;
             var mat  = new THREE.MeshLambertMaterial({color: color});
             var cube = new THREE.Mesh(geom, mat);
             cube.position.copy(planet.position);
@@ -101,3 +84,20 @@ visu.Init = function(scene, pickingScene) {
     light.position.set(10, 10, 10);
     scene.add(light);
 }
+
+visu.AddUnits = function(scene) {
+    var geom = new THREE.BoxGeometry(0.1, 0.1, 0.1);
+    scene.children[1].children.forEach(function(planet){
+            var color = (planet.player == "human") ? 0x00FF00 : 0xFFFF00;
+            var mat   = new THREE.MeshLambertMaterial({color: color});
+            var cube  = new THREE.Mesh(geom, mat);
+            cube.position.copy(planet.position);
+            cube.position.x += Math.random()*2 - 1;
+            cube.position.y += Math.random()*2 - 1;
+            cube.rotation.z += Math.random()*2 - 1;
+            cube.player = planet.player;
+            cube.originalColor = color;
+            scene.children[0].add(cube);
+            phys.GoTo([cube], planet.position);
+    });
+};
