@@ -56,9 +56,6 @@ visu.Init = function(scene, pickingScene) {
             var mat  = new THREE.MeshLambertMaterial({color: color});
             var cube = new THREE.Mesh(geom, mat);
             cube.position.copy(planet.position);
-            cube.position.x += Math.random()*2 - 1;
-            cube.position.y += Math.random()*2 - 1;
-            cube.rotation.z += Math.random()*2 - 1;
             cube.player = planet.player;
             cube.originalColor = color;
             cubes.add(cube);
@@ -92,9 +89,6 @@ visu.AddUnits = function(scene) {
             var mat   = new THREE.MeshLambertMaterial({color: color});
             var cube  = new THREE.Mesh(geom, mat);
             cube.position.copy(planet.position);
-            cube.position.x += Math.random()*2 - 1;
-            cube.position.y += Math.random()*2 - 1;
-            cube.rotation.z += Math.random()*2 - 1;
             cube.player = planet.player;
             cube.originalColor = color;
             scene.children[0].add(cube);

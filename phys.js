@@ -23,6 +23,7 @@ phys.Update = function(delta) {
         if (!obj.dest)
             obj.dest = phys.dest
         var dir = obj.dest.clone().sub(obj.position).normalize();
+        dir = phys.ValidNorm(dir);
         obj.velocity.add(dir.divideScalar(8));
 
         for (var j = 0; j < phys.objs.length; ++j) {
@@ -30,14 +31,16 @@ phys.Update = function(delta) {
                 continue;
             var objB = phys.objs[j];
             dir = objB.position.clone().sub(obj.position).normalize();
-            var distSq = Math.max(1e-10, obj.position.distanceToSquared(objB.position));
-            obj.velocity.sub(dir.divideScalar(distSq * 600));
+            dir = phys.ValidNorm(dir);
+            var distSq = Math.max(0.02, obj.position.distanceToSquared(objB.position));
+            obj.velocity.sub(dir.divideScalar(distSq * 800));
         }
 
         for (var j = 0; j < phys.planets.length; ++j) {
             var planet = phys.planets[j];
             dir = planet.position.clone().sub(obj.position).normalize();
-            var distSq = Math.max(1e-10, obj.position.distanceToSquared(planet.position));
+            dir = phys.ValidNorm(dir);
+            var distSq = Math.max(0.02, obj.position.distanceToSquared(planet.position));
             obj.velocity.sub(dir.divideScalar(distSq * 20));
         }
 
@@ -47,4 +50,12 @@ phys.Update = function(delta) {
                          .divideScalar(20) );
         obj.position.add(obj.velocity.clone().multiplyScalar(delta));
     }
+}
+
+phys.ValidNorm = function(vec) {
+    if (   (vec.x === 0 && vec.y === 0 && vec.z === 0)
+        || isNaN(vec.x) || isNaN(vec.y) || isNaN(vec.z) ) {
+        return new THREE.Vector3(Math.random(), Math.random(), Math.random()).normalize();
+    }
+    return vec;
 }
