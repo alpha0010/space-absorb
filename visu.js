@@ -40,7 +40,6 @@ visu.Init = function(scene, pickingScene) {
         var pickingGeometry = new THREE.SphereGeometry(planetSize*2, 32, 32);
         var pickingPlanet   = new THREE.Mesh(pickingGeometry,material);
         pickingPlanet.position.set(planet.position.x, planet.position.y, planet.position.z);
-        //planet.id = i;
         planets.add(planet);
         pickingScene.add(pickingPlanet);
 

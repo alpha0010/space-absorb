@@ -29,6 +29,8 @@ main.Init = function() {
     main.raycaster = new THREE.Raycaster();
     main.mouse     = new THREE.Vector3();
     main.mouseOrig = new THREE.Vector3();
+    main.mouseCopy;
+    //main.projector = new THREE.Projector();
     main.pickingScene   = new THREE.Scene();
     main.pickingTexture = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight);
     main.pickingTexture.minFilter = THREE.LinearFilter;
@@ -59,7 +61,7 @@ main.Init = function() {
     visu.Init(main.scene, main.pickingScene);
     phys.Init(main.scene.children[0], main.scene.children[1]);
     main.Animate();  
-    window.setInterval(function(){visu.AddUnits(main.scene)},10000);
+    window.setInterval(function(){visu.AddUnits(main.scene)},5000);
     // alternate phys update line
     //window.setInterval(function(){phys.Update(main.clock.getDelta())},30);
 }
@@ -100,6 +102,7 @@ main.OnMouseMove = function(event) {
     main.mouse.x = (event.pageX - offset.left)/main.width * 2 - 1;
     main.mouse.y = -(event.pageY - offset.top)/main.height * 2 + 1;
     main.mouse.z = 0;
+    main.mouseCopy = main.mouse.clone();
     main.dontDrag = main.mouse.distanceTo(main.mouseOrig) < 0.05 && main.dontDrag;
     main.mouse.unproject(main.camera);
 
@@ -120,13 +123,24 @@ main.OnMouseMove = function(event) {
     }
     else if (main.selectedPlanet && event.button == 0 && !main.dontDrag ) {
         main.didDrag = true;
-        var dir = main.mouse.sub( main.camera.position ).normalize();
-        var distance = - (main.camera.position.z-main.selectedPlanet.position.z) / dir.z;
-        var pos = main.camera.position.clone().add( dir.multiplyScalar( distance ) );
+        
+        var selectedPlanetCoords = main.selectedPlanet.position.clone();
+        var planetSize = 2* Math.tan(Math.PI/8) * 1.8 / main.camera.position.distanceTo(selectedPlanetCoords);
+        selectedPlanetCoords.project(main.camera)
+        selectedPlanetCoords.z = 0;
+        scale = Math.max(main.mouseCopy.distanceTo(selectedPlanetCoords)/planetSize, 0.51);
+       
+        
+        /*var dir = main.mouse.sub( main.camera.position ).normalize();
+        var distance = -main.camera.position.distanceTo(main.selectedPlanet.position) / dir.applyQuaternion( main.camera.quaternion ).z;
+        var pos = main.camera.position.clone().add( dir.multiplyScalar( distance ) );*/
 
+        
+        
         var selectionSphere = main.scene.children[2];
         selectionSphere.material.opacity = 1.0;
-        var scale = Math.max(scale = pos.distanceTo(main.selectedPlanet.position),0.51);
+        //var scale = Math.max(scale = pos.distanceTo(main.selectedPlanet.position),0.51);
+        $('#text').text(scale + "   " + planetSize+ "   " + main.height + "   " + main.camera.position.distanceTo(selectedPlanetCoords));
 
         selectionSphere.scale.set(scale,scale,scale);
 

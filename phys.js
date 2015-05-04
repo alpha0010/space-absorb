@@ -57,7 +57,7 @@ phys.Update = function(delta) {
         for (var j = 0; j < phys.planets.length; ++j) {
             var planet = phys.planets[j];
             var distSq = Math.max(0.02, obj.position.distanceToSquared(planet.position));
-            if (planet.player !== obj.player || planet.power < 10) {
+            if (planet.player !== obj.player || planet.power < 5) {
                 if (distSq < 0.2) {
                     if (planet.player === obj.player)
                         planet.power++;
