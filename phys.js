@@ -1,7 +1,7 @@
 var phys = {};
 
 phys.Init = function(unitGroup, planetGroup) {
-    phys.objs    = unitGroup.children;
+    phys.objGrp  = unitGroup;
     phys.planets = planetGroup.children;
     phys.dest    = new THREE.Vector3(Math.random()*4-2, Math.random()*2-1, Math.random()*4-2);
 }
@@ -13,8 +13,13 @@ phys.GoTo = function(units, destination) {
 }
 
 phys.Update = function(delta) {
-    for (var i = 0; i < phys.objs.length; ++i) {
-        var obj = phys.objs[i];
+    var objs   = phys.objGrp.children;
+    var remIdx = [];
+    for (var i = 0; i < objs.length; ++i) {
+        if (remIdx.indexOf(i) !== -1)
+            continue;
+
+        var obj = objs[i];
         obj.rotation.x += delta / 3;
         obj.rotation.y += delta / 3;
 
@@ -26,29 +31,67 @@ phys.Update = function(delta) {
         dir = phys.ValidNorm(dir);
         obj.velocity.add(dir.divideScalar(8));
 
-        for (var j = 0; j < phys.objs.length; ++j) {
+        var isDead = false;
+        for (var j = 0; j < objs.length; ++j) {
             if (i === j)
                 continue;
-            var objB = phys.objs[j];
+            var objB = objs[j];
             dir = objB.position.clone().sub(obj.position).normalize();
             dir = phys.ValidNorm(dir);
             var distSq = Math.max(0.02, obj.position.distanceToSquared(objB.position));
-            obj.velocity.sub(dir.divideScalar(distSq * 800));
+            if (obj.player === objB.player)
+                obj.velocity.sub(dir.divideScalar(distSq * 800));
+            else if (distSq < 0.04 && remIdx.indexOf(j) === -1) {
+                // annihilate
+                remIdx.push(i);
+                remIdx.push(j);
+                isDead = true;
+                break;
+            }
+            else
+                obj.velocity.add(dir.divideScalar(distSq * 200));
         }
+        if (isDead)
+            continue;
 
         for (var j = 0; j < phys.planets.length; ++j) {
             var planet = phys.planets[j];
+            var distSq = Math.max(0.02, obj.position.distanceToSquared(planet.position));
+            if (planet.player !== obj.player || planet.power < 10) {
+                if (distSq < 0.2) {
+                    if (planet.player === obj.player)
+                        planet.power++;
+                    else if (planet.power === 1) {
+                        planet.player = obj.player;
+                        planet.color  = (planet.player == "human") ? 0x0000FF : 0x999999;
+                        planet.material.color.setHex(planet.color);
+                    }
+                    else
+                        planet.power--;
+                    remIdx.push(i);
+                    isDead = true;
+                    break;
+                }
+                continue; // do not repel
+            }
             dir = planet.position.clone().sub(obj.position).normalize();
             dir = phys.ValidNorm(dir);
-            var distSq = Math.max(0.02, obj.position.distanceToSquared(planet.position));
             obj.velocity.sub(dir.divideScalar(distSq * 20));
         }
+        if (isDead)
+            continue;
 
         obj.velocity.sub( obj.velocity.clone()
                          .multiply(obj.velocity)
                          .multiply(obj.velocity)
                          .divideScalar(20) );
         obj.position.add(obj.velocity.clone().multiplyScalar(delta));
+    }
+
+    if (remIdx.length > 0) {
+        phys.objGrp.children = objs.filter(function(elem, idx) {
+            return remIdx.indexOf(idx) === -1;
+        });
     }
 }
 

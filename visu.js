@@ -34,7 +34,8 @@ visu.Init = function(scene, pickingScene) {
         var planet   = new THREE.Mesh(geometry,material);
         planet.position.set(randInt(-10,10), randInt(-5,5), randInt(-5,5));
         planet.player = (i<5) ? "human" : "neutral";
-        planet.color = (planet.player == "human") ? 0x0000FF : 0x999999;
+        planet.power  = 10;
+        planet.color  = (planet.player == "human") ? 0x0000FF : 0x999999;
         planet.material.color.setHex(planet.color);
         var pickingGeometry = new THREE.SphereGeometry(planetSize*2, 32, 32);
         var pickingPlanet   = new THREE.Mesh(pickingGeometry,material);
