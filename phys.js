@@ -98,7 +98,7 @@ phys.Update = function(delta) {
 phys.ValidNorm = function(vec) {
     if (   (vec.x === 0 && vec.y === 0 && vec.z === 0)
         || isNaN(vec.x) || isNaN(vec.y) || isNaN(vec.z) ) {
-        return new THREE.Vector3(Math.random(), Math.random(), Math.random()).normalize();
+        return new THREE.Vector3(Math.random()-0.5, Math.random()-0.5, Math.random()-0.5).normalize();
     }
     return vec;
 }

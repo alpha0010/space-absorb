@@ -60,6 +60,7 @@ main.Init = function() {
     main.didDrag   = false;
     visu.Init(main.scene, main.pickingScene);
     phys.Init(main.scene.children[0], main.scene.children[1]);
+    enem.Init(main.scene.children[0], main.scene.children[1]);
     main.Animate();  
     window.setInterval(function(){visu.AddUnits(main.scene)},5000);
     // alternate phys update line
@@ -184,7 +185,9 @@ main.OnResize = function() {
 }
 
 main.Render = function() {
-    phys.Update(main.clock.getDelta());
+    var delta = Math.min(main.clock.getDelta(), 0.2);
+    phys.Update(delta);
     main.renderer.render(main.scene, main.camera);
     main.renderer.render(main.pickingScene, main.camera, main.pickingTexture);
+    enem.Update(delta);
 }
