@@ -30,7 +30,6 @@ main.Init = function() {
     main.mouse     = new THREE.Vector3();
     main.mouseOrig = new THREE.Vector3();
     main.mouseCopy;
-    //main.projector = new THREE.Projector();
     main.pickingScene   = new THREE.Scene();
     main.pickingTexture = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight);
     main.pickingTexture.minFilter = THREE.LinearFilter;
@@ -128,17 +127,9 @@ main.OnMouseMove = function(event) {
         selectedPlanetCoords.project(main.camera)
         selectedPlanetCoords.z = 0;
         scale = Math.max(main.mouseCopy.distanceTo(selectedPlanetCoords)/planetSize, 0.51);
-       
-        
-        /*var dir = main.mouse.sub( main.camera.position ).normalize();
-        var distance = -main.camera.position.distanceTo(main.selectedPlanet.position) / dir.applyQuaternion( main.camera.quaternion ).z;
-        var pos = main.camera.position.clone().add( dir.multiplyScalar( distance ) );*/
 
-        
-        
         var selectionSphere = main.scene.children[2];
         selectionSphere.material.opacity = 1.0;
-        //var scale = Math.max(scale = pos.distanceTo(main.selectedPlanet.position),0.51);
         $('#text').text(scale + "   " + planetSize+ "   " + main.height + "   " + main.camera.position.distanceTo(selectedPlanetCoords));
 
         selectionSphere.scale.set(scale,scale,scale);
