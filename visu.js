@@ -13,8 +13,8 @@ visu.Init = function(scene, pickingScene) {
         cubes.add(cube);
     }      
     planets = new THREE.Object3D();
-    pickingPlanets = new THREE.Object3D();
     scene.add(planets); // scene.children[1]
+    pickingPlanets = new THREE.Object3D();
 
     var geometry = new THREE.SphereGeometry(1, 10, 10);
     var material = new THREE.MeshBasicMaterial({
@@ -24,7 +24,9 @@ visu.Init = function(scene, pickingScene) {
         opacity:      0.0
     });
     var selectionSphere = new THREE.Mesh(geometry,material);
-    scene.add(selectionSphere);
+    scene.add(selectionSphere); // scene.children[2]
+    texts = new THREE.Object3D();
+    scene.add(texts);
 
     for (var i=0; i<10; ++i) {
         var planetSize = 0.5;
@@ -35,23 +37,25 @@ visu.Init = function(scene, pickingScene) {
         planet.position.set(randInt(-10,10), randInt(-5,5), randInt(-5,5));
         planet.player = (i<5) ? "human" : "neutral";
         planet.power  = 10;
-        planet.color  = (planet.player == "human") ? 0x0000FF : 0x999999;
+        planet.color  = (planet.player == "human") ? 0x0000FF : 0x00FF00;
         planet.material.color.setHex(planet.color);
+        planet.iddd = i;
         var pickingGeometry = new THREE.SphereGeometry(planetSize*2, 32, 32);
         var pickingPlanet   = new THREE.Mesh(pickingGeometry,material);
         pickingPlanet.position.set(planet.position.x, planet.position.y, planet.position.z);
         planets.add(planet);
         pickingScene.add(pickingPlanet);
+        
+        /*planet.textSprite = visu.MakeTextSprite (planet.power);
+        planet.textSprite.position.copy(planet.position);
+        planet.textSprite.position.x += 0.2;
+        planet.textSprite.position.y += 0.8;
+        //planet.textSprite.position.z += 1;
+        //planet.textSprite.scale.set(5,5,5);
+        texts.add(planet.textSprite);*/
+        
 
-        /*var textGeom = new THREE.TextGeometry(randInt(1,50), {
-            size: 10,
-            height: 1
-        });
-        var textMat = new THREE.MeshBasicMaterial( {color: "white"} );
-        mesh = new THREE.Mesh( textGeom, textMat );
-        mesh.position.set(planet.position.x-5,planet.position.y+15,planet.position.z)
-        scene.add( mesh );*/
-        for (var j = 0; j < 3; ++j) {
+        for (var j = 0; j <10; ++j) {
             var color = (planet.player == "human") ? 0x00FF00 : 0xFFFF00;
             var mat  = new THREE.MeshLambertMaterial({color: color});
             var cube = new THREE.Mesh(geom, mat);
@@ -95,3 +99,60 @@ visu.AddUnits = function(scene) {
             phys.GoTo([cube], planet.position);
     });
 };
+
+
+// taken and modified from https://stemkoski.github.io/Three.js/Sprite-Text-Labels.html
+visu.MakeTextSprite = function( message, parameters )
+{
+    if ( parameters === undefined ) parameters = {};
+    
+    var fontface = parameters.hasOwnProperty("fontface") ? 
+        parameters["fontface"] : "Arial";
+    
+    var fontsize = parameters.hasOwnProperty("fontsize") ? 
+        parameters["fontsize"] : 100;
+    
+    var borderThickness = parameters.hasOwnProperty("borderThickness") ? 
+        parameters["borderThickness"] : 4;
+    
+    var borderColor = parameters.hasOwnProperty("borderColor") ?
+        parameters["borderColor"] : { r:255, g:0, b:0, a:1.0 };
+    
+    var backgroundColor = parameters.hasOwnProperty("backgroundColor") ?
+        parameters["backgroundColor"] : { r:255, g:255, b:255, a:1.0 };
+
+    //var spriteAlignment = THREE.SpriteAlignment.topLeft;
+        
+    var canvas = document.createElement('canvas');
+    var context = canvas.getContext('2d');
+    context.font = "Bold " + fontsize + "px " + fontface;
+    
+    // get size data (height depends only on font size)
+    var metrics = context.measureText( message );
+    var textWidth = metrics.width;
+    
+    // background color
+    context.fillStyle   = "rgba(" + backgroundColor.r + "," + backgroundColor.g + ","
+                                  + backgroundColor.b + "," + backgroundColor.a + ")";
+    // border color
+    context.strokeStyle = "rgba(" + borderColor.r + "," + borderColor.g + ","
+                                  + borderColor.b + "," + borderColor.a + ")";
+
+    context.lineWidth = borderThickness;
+    //roundRect(context, borderThickness/2, borderThickness/2, textWidth + borderThickness, fontsize * 1.4 + borderThickness, 6);
+    // 1.4 is extra height factor for text below baseline: g,j,p,q.
+    
+    // text color
+    context.fillStyle = "rgba(255, 0, 0, 1.0)";
+
+    context.fillText( message, borderThickness, fontsize + borderThickness);
+    
+    // canvas contents will be used for a texture
+    var texture = new THREE.Texture(canvas) 
+    texture.needsUpdate = true;
+
+    var spriteMaterial = new THREE.SpriteMaterial( { map: texture } );
+    var sprite = new THREE.Sprite( spriteMaterial );
+    //sprite.scale.set(1,1,1);
+    return sprite;    
+}

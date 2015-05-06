@@ -41,11 +41,8 @@ main.Init = function() {
     main.dontDrag = true;
 
     main.controls = new THREE.TrackballControls(main.camera, main.renderer.domElement);
-    main.controls.rotateSpeed = 2.5;
+    main.controls.rotateSpeed = 2.0;
     main.controls.zoomSpeed   = 3;
-    main.controls.panSpeed    = 0.8;
-    main.controls.noZoom = false;
-    main.controls.noPan  = false;
     main.controls.staticMoving = true;
     main.controls.addEventListener( 'change', main.Render );
     main.controls.keys = [ 0, 83, 65, 68 ];
@@ -62,7 +59,7 @@ main.Init = function() {
     phys.Init(main.scene.children[0], main.scene.children[1]);
     enem.Init(main.scene.children[0], main.scene.children[1]);
     main.Animate();  
-    window.setInterval(function(){visu.AddUnits(main.scene)},5000);
+    window.setInterval(function(){visu.AddUnits(main.scene)},2000);
     // alternate phys update line
     //window.setInterval(function(){phys.Update(main.clock.getDelta())},30);
 }
@@ -106,17 +103,18 @@ main.OnMouseMove = function(event) {
     main.mouseCopy = main.mouse.clone();
     main.dontDrag = main.mouse.distanceTo(main.mouseOrig) < 0.05 && main.dontDrag;
     main.mouse.unproject(main.camera);
-
+    
+    
+    
     if (!main.mouseDown) {
-        main.scene.children[1].children.forEach(function(planet) {
-            planet.material.color.setHex(planet.color);
-        });
-
         main.raycaster.set(main.camera.position, main.mouse.sub(main.camera.position).normalize());
         var intersects = main.raycaster.intersectObjects(main.pickingScene.children);
 
         if (intersects[0]) {
-            intersects[0].object.material.color.setRGB(0, 255, 0);
+            var planetColor = intersects[0].object.material.color;
+            planetColor.r /= 2;
+            planetColor.g /= 2;
+            planetColor.b /= 2;
             main.selectedPlanet = intersects[0].object;
         }
         else
@@ -185,6 +183,15 @@ main.OnResize = function() {
 }
 
 main.Render = function() {
+    main.scene.children[1].children.forEach(function(planet) {
+        planet.material.color.setHex(planet.color * planet.power / 5 + 0xFFFFFF * (5 - planet.power) / 5);
+        if(main.selectedPlanet && main.selectedPlanet.position.equals(planet.position)){
+            planetColor = planet.material.color;
+            planetColor.r /= 2;
+            planetColor.g /= 2;
+            planetColor.b /= 2; 
+        }   
+    });
     var delta = Math.min(main.clock.getDelta(), 0.2);
     phys.Update(delta);
     main.renderer.render(main.scene, main.camera);

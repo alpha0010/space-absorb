@@ -63,7 +63,7 @@ phys.Update = function(delta) {
                         planet.power++;
                     else if (planet.power === 1) {
                         planet.player = obj.player;
-                        planet.color  = (planet.player == "human") ? 0x0000FF : 0x999999;
+                        planet.color  = (planet.player == "human") ? 0x0000FF : 0x00FF00;
                         planet.material.color.setHex(planet.color);
                     }
                     else
