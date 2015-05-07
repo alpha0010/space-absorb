@@ -77,7 +77,7 @@ visu.InitPlanets = function(scene, pickingScene){
             var color = (planet.player == "human") ? 0x00FF00 : 0xFFFF00;
             var mat  = new THREE.MeshLambertMaterial({color: color});
             var cube = new THREE.Mesh(visu.spaceship.geometry, mat);
-            cube.scale.set(0.1,0.1,0.1);
+            cube.scale.set(0.08,0.08,0.08);
             cube.position.copy(planet.position);
             cube.player = planet.player;
             cube.originalColor = color;
@@ -93,7 +93,7 @@ visu.AddUnits = function(scene) {
             var color = (planet.player == "human") ? 0x00FF00 : 0xFFFF00;
             var mat   = new THREE.MeshLambertMaterial({color: color});
             var cube = new THREE.Mesh(visu.spaceship.geometry, mat);
-            cube.scale.set(0.1,0.1,0.1);
+            cube.scale.set(0.08,0.08,0.08);
             cube.position.copy(planet.position);
             cube.player = planet.player;
             cube.originalColor = color;

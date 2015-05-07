@@ -71,7 +71,7 @@ main.OnKeyDown = function(event) {
     if (event.keyCode == 32) {
         event.preventDefault();
         main.selectedUnits.forEach(function(unit) {
-            unit.material.color.setStyle(unit.originalColor);
+            unit.material.color.setHex(unit.originalColor);
         });
         main.selectedUnits = [];
     }
