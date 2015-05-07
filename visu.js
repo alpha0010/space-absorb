@@ -1,8 +1,16 @@
 var visu = {};
 
 visu.Init = function(scene, pickingScene) {
+    var loader = new THREE.ColladaLoader();
+    //loader.optinos.convertUpAxis = true;
+    loader.load("./spaceship.dae", function (collada){
+        visu.spaceship = collada.scene.children[2].children[0];
+        //visu.speceship.scale.set(0.1,0.1,0.1);
+        visu.InitPlanets(scene, pickingScene);
+    })
     var geom = new THREE.BoxGeometry(0.1, 0.1, 0.1);
-    var cubes = new THREE.Object3D();
+    cubes = new THREE.Object3D();
+    
     scene.add(cubes); // scene.children[0]
     for (var i = 0; i < 0; ++i) {
         var mat  = new THREE.MeshLambertMaterial({color: 0x00ff00});
@@ -25,9 +33,28 @@ visu.Init = function(scene, pickingScene) {
     });
     var selectionSphere = new THREE.Mesh(geometry,material);
     scene.add(selectionSphere); // scene.children[2]
-    texts = new THREE.Object3D();
-    scene.add(texts);
+    
 
+    var directions  = ["xpos", "xneg", "ypos", "yneg", "zneg", "zpos"];
+    var skyGeometry = new THREE.BoxGeometry(10000, 10000, 10000);    
+    var materialArray = [];
+    for (var i = 0; i < 6; ++i) {
+        materialArray.push(new THREE.MeshBasicMaterial({
+            map:  THREE.ImageUtils.loadTexture( "img/" + directions[i] + ".png" ),
+            side: THREE.BackSide
+        }));
+    }
+    var skyMaterial = new THREE.MeshFaceMaterial(materialArray);
+    var skyBox = new THREE.Mesh(skyGeometry, skyMaterial);
+    scene.add(skyBox);
+
+    scene.add(new THREE.AmbientLight(0x222222));
+    var light = new THREE.PointLight(0xffffff);
+    light.position.set(10, 10, 10);
+    scene.add(light);
+}
+
+visu.InitPlanets = function(scene, pickingScene){
     for (var i=0; i<10; ++i) {
         var planetSize = 0.5;
         var planetColor = "red";
@@ -49,7 +76,8 @@ visu.Init = function(scene, pickingScene) {
         for (var j = 0; j <10; ++j) {
             var color = (planet.player == "human") ? 0x00FF00 : 0xFFFF00;
             var mat  = new THREE.MeshLambertMaterial({color: color});
-            var cube = new THREE.Mesh(geom, mat);
+            var cube = new THREE.Mesh(visu.spaceship.geometry, mat);
+            cube.scale.set(0.1,0.1,0.1);
             cube.position.copy(planet.position);
             cube.player = planet.player;
             cube.originalColor = color;
@@ -57,24 +85,6 @@ visu.Init = function(scene, pickingScene) {
             phys.GoTo([cube], planet.position);
         }
     }
-
-    var directions  = ["xpos", "xneg", "ypos", "yneg", "zneg", "zpos"];
-    var skyGeometry = new THREE.BoxGeometry(10000, 10000, 10000);    
-    var materialArray = [];
-    for (var i = 0; i < 6; ++i) {
-        materialArray.push(new THREE.MeshBasicMaterial({
-            map:  THREE.ImageUtils.loadTexture( "img/" + directions[i] + ".png" ),
-            side: THREE.BackSide
-        }));
-    }
-    var skyMaterial = new THREE.MeshFaceMaterial(materialArray);
-    var skyBox = new THREE.Mesh(skyGeometry, skyMaterial);
-    scene.add(skyBox);
-
-    scene.add(new THREE.AmbientLight(0x222222));
-    var light = new THREE.PointLight(0xffffff);
-    light.position.set(10, 10, 10);
-    scene.add(light);
 }
 
 visu.AddUnits = function(scene) {
@@ -82,7 +92,8 @@ visu.AddUnits = function(scene) {
     scene.children[1].children.forEach(function(planet){
             var color = (planet.player == "human") ? 0x00FF00 : 0xFFFF00;
             var mat   = new THREE.MeshLambertMaterial({color: color});
-            var cube  = new THREE.Mesh(geom, mat);
+            var cube = new THREE.Mesh(visu.spaceship.geometry, mat);
+            cube.scale.set(0.1,0.1,0.1);
             cube.position.copy(planet.position);
             cube.player = planet.player;
             cube.originalColor = color;
