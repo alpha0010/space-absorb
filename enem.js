@@ -1,18 +1,21 @@
 var enem = {};
 
 enem.Init = function(unitGroup, planetGroup) {
-    enem.objGrp  = unitGroup;
-    enem.planets = planetGroup.children;
-    enem.lastAct = 0;
+    enem.objGrp    = unitGroup;
+    enem.planetGrp = planetGroup;
+    enem.lastAct   = 0;
+}
 
-    for (var i = 0; i < enem.planets.length; ++i) {
-        var planet = enem.planets[i];
+enem.MeasurePlanets = function() {
+    var planets = enem.planetGrp.children;
+    for (var i = 0; i < planets.length; ++i) {
+        var planet = planets[i];
         planet.distOrder = [];
-        for (var j = 0; j < enem.planets.length; ++j)
+        for (var j = 0; j < planets.length; ++j)
             planet.distOrder[j] = j;
         planet.distOrder.sort(function(a, b) {
-            var distA = planet.position.distanceToSquared(enem.planets[a].position);
-            var distB = planet.position.distanceToSquared(enem.planets[b].position);
+            var distA = planet.position.distanceToSquared(planets[a].position);
+            var distB = planet.position.distanceToSquared(planets[b].position);
             return distA - distB;
         });
     }
@@ -24,11 +27,17 @@ enem.Update = function(delta) {
         return;
     enem.lastAct = 0;
 
+    var planets = enem.planetGrp.children;
+    if (planets.length == 0)
+        return;
+    if (!("distOrder" in planets[0]))
+        enem.MeasurePlanets();
+
     var objs = enem.objGrp.children;
     var targPlanet   = 0;
     var targStrength = 9000; // not really...
-    for (var i = 0; i < enem.planets.length; ++i) {
-        var planet = enem.planets[i];
+    for (var i = 0; i < planets.length; ++i) {
+        var planet = planets[i];
         if (planet.player != "human")
             continue;
         var curStrength = 0;
@@ -55,7 +64,7 @@ enem.Update = function(delta) {
         return;
 
     for (var i = 0; i < targPlanet.distOrder.length; ++i) {
-        var planet = enem.planets[targPlanet.distOrder[i]];
+        var planet = planets[targPlanet.distOrder[i]];
         for (var j = 0; j < objs.length; ++j) {
             var obj = objs[j];
             if (obj.player != "human" && obj.dest.equals(planet.position)) {
