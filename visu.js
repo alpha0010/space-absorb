@@ -5,6 +5,7 @@ visu.Init = function(scene, pickingScene) {
     //loader.optinos.convertUpAxis = true;
     loader.load("./spaceship.dae", function (collada){
         visu.spaceship = collada.scene.children[2].children[0];
+        visu.spaceship.geometry.applyMatrix(new THREE.Matrix4().makeRotationX(-Math.PI/2));
         //visu.speceship.scale.set(0.1,0.1,0.1);
         visu.InitPlanets(scene, pickingScene);
     })

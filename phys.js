@@ -20,8 +20,6 @@ phys.Update = function(delta) {
             continue;
 
         var obj = objs[i];
-        obj.rotation.x += delta / 3;
-        obj.rotation.y += delta / 3;
 
         if (!obj.velocity)
             obj.velocity = new THREE.Vector3();
@@ -85,6 +83,7 @@ phys.Update = function(delta) {
                          .multiply(obj.velocity)
                          .multiply(obj.velocity)
                          .divideScalar(20) );
+        obj.lookAt(obj.position.clone().add(obj.velocity));
         obj.position.add(obj.velocity.clone().multiplyScalar(delta));
     }
 
