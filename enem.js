@@ -23,7 +23,7 @@ enem.MeasurePlanets = function() {
 
 enem.Update = function(delta) {
     enem.lastAct += delta;
-    if (enem.lastAct < 10)
+    if (enem.lastAct < 5)
         return;
     enem.lastAct = 0;
 
@@ -54,13 +54,13 @@ enem.Update = function(delta) {
         }
     }
 
-    targStrength    = Math.floor(targStrength * 1.2) + 10;
+    targStrength    = Math.floor(targStrength * 1.9) + 15;
     var ownStrength = 0;
     for (var i = 0; i < objs.length; ++i) {
         if (objs[i].player != "human")
             ++ownStrength;
     }
-    if (targStrength * 2 > ownStrength)
+    if (targStrength * 1.1 > ownStrength)
         return;
 
     for (var i = 0; i < targPlanet.distOrder.length; ++i) {
