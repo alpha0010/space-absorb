@@ -1,12 +1,12 @@
 var visu = {};
 
-visu.Init = function(scene, pickingScene) {
+visu.Init = function(scene, pickingScene, enem) {
     var loader = new THREE.ColladaLoader();
     //loader.optinos.convertUpAxis = true;
     loader.load("./spaceship.dae", function (collada){
         visu.spaceship = collada.scene.children[2].children[0];
         //visu.speceship.scale.set(0.1,0.1,0.1);
-        visu.InitPlanets(scene, pickingScene);
+        visu.InitPlanets(scene, pickingScene, enem);
     })
     var geom = new THREE.BoxGeometry(0.1, 0.1, 0.1);
     cubes = new THREE.Object3D();
@@ -54,7 +54,7 @@ visu.Init = function(scene, pickingScene) {
     scene.add(light);
 }
 
-visu.InitPlanets = function(scene, pickingScene){
+visu.InitPlanets = function(scene, pickingScene, enem){
     for (var i=0; i<10; ++i) {
         var planetSize = 0.5;
         var planetColor = "red";
@@ -85,6 +85,9 @@ visu.InitPlanets = function(scene, pickingScene){
             phys.GoTo([cube], planet.position);
         }
     }
+    
+    enem.Init(scene.children[0], scene.children[1]);
+    
 }
 
 visu.AddUnits = function(scene) {

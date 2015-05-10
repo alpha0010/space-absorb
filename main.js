@@ -54,9 +54,8 @@ main.Init = function() {
     $(document).keydown(main.OnKeyDown);
     main.mouseDown = false;
     main.didDrag   = false;
-    visu.Init(main.scene, main.pickingScene);
+    visu.Init(main.scene, main.pickingScene, enem);
     phys.Init(main.scene.children[0], main.scene.children[1]);
-    enem.Init(main.scene.children[0], main.scene.children[1]);
     main.Animate();  
     window.setInterval(function(){visu.AddUnits(main.scene)},2000);
     // alternate phys update line

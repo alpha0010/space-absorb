@@ -23,6 +23,7 @@ enem.Update = function(delta) {
     if (enem.lastAct < 10)
         return;
     enem.lastAct = 0;
+    if (!enem.objGrp) return;
 
     var objs = enem.objGrp.children;
     var targPlanet   = 0;
@@ -45,7 +46,7 @@ enem.Update = function(delta) {
         }
     }
 
-    targStrength    = Math.floor(targStrength * 1.2) + 10;
+    targStrength    = Math.floor(targStrength * 1.2) + 15;
     var ownStrength = 0;
     for (var i = 0; i < objs.length; ++i) {
         if (objs[i].player != "human")
