@@ -48,7 +48,7 @@ visu.Init = function(scene, pickingScene) {
     var skyBox = new THREE.Mesh(skyGeometry, skyMaterial);
     scene.add(skyBox);
 
-    scene.add(new THREE.AmbientLight(0x222222));
+    scene.add(new THREE.AmbientLight(0x333333));
     var light = new THREE.PointLight(0xffffff);
     light.position.set(10, 10, 10);
     scene.add(light);
@@ -103,7 +103,7 @@ visu.AddUnits = function(scene) {
     });
 }
 
-visu.DrawText = function(strs, scene) {
+visu.DrawText = function(strs, scene, camera) {
     var canv = document.createElement("canvas");
     canv.width  = 1024;
     canv.height = 512;
@@ -121,5 +121,9 @@ visu.DrawText = function(strs, scene) {
     var sprite = new THREE.Sprite(mat);
 	sprite.scale.set(8, 4, 1.0);
 	sprite.position.set(0, 0, 0);
+    var camPos = camera.position;
+    var lookAtVector = new THREE.Vector3(0,0,-1);
+    lookAtVector.applyQuaternion(camera.quaternion);
+    sprite.position.set(camPos.x+lookAtVector.x*10, camPos.y+lookAtVector.y*10, camPos.z+lookAtVector.z*10);
     scene.add(sprite);
 }
