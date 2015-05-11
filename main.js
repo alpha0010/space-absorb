@@ -81,9 +81,9 @@ main.IsEnd = function() {
     }
 
     if (planets[0].player == "human")
-        visu.DrawText(["Victory", "press <space>"], main.scene);
+        visu.DrawText(["Victory", "press <space>"], main.scene, main.camera);
     else
-        visu.DrawText(["Game Over", "press <space>"], main.scene);
+        visu.DrawText(["Game Over", "press <space>"], main.scene, main.camera);
     main.gameOver = true;
     return true;
 }
