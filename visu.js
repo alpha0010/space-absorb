@@ -1,12 +1,11 @@
 var visu = {};
 
 visu.Init = function(scene, pickingScene) {
+    planetNormalMap = THREE.ImageUtils.loadTexture("img/rockNorm.jpg");
     var loader = new THREE.ColladaLoader();
-    //loader.optinos.convertUpAxis = true;
     loader.load("./spaceship.dae", function (collada){
         visu.spaceship = collada.scene.children[2].children[0];
         visu.spaceship.geometry.applyMatrix(new THREE.Matrix4().makeRotationX(-Math.PI/2));
-        //visu.speceship.scale.set(0.1,0.1,0.1);
         visu.InitPlanets(scene, pickingScene);
     });
     var geom = new THREE.BoxGeometry(0.1, 0.1, 0.1);
@@ -60,7 +59,8 @@ visu.InitPlanets = function(scene, pickingScene){
         var planetSize = 0.5;
         var planetColor = "red";
         var geometry = new THREE.SphereGeometry(planetSize, 32, 32);
-        var material = new THREE.MeshBasicMaterial({color: planetColor});
+        var material = new THREE.MeshPhongMaterial({color: planetColor});
+        material.normalMap = planetNormalMap;
         var planet   = new THREE.Mesh(geometry,material);
         planet.position.set(randInt(-10,10), randInt(-5,5), randInt(-5,5));
         planet.player = (i<5) ? "human" : "neutral";
@@ -76,7 +76,7 @@ visu.InitPlanets = function(scene, pickingScene){
 
         for (var j = 0; j <10; ++j) {
             var color = (planet.player == "human") ? 0x00FF00 : 0xFFFF00;
-            var mat  = new THREE.MeshLambertMaterial({color: color});
+            var mat  = new THREE.MeshPhongMaterial({color: color});
             var cube = new THREE.Mesh(visu.spaceship.geometry, mat);
             cube.scale.set(0.08,0.08,0.08);
             cube.position.copy(planet.position);
@@ -92,7 +92,7 @@ visu.AddUnits = function(scene) {
     var geom = new THREE.BoxGeometry(0.1, 0.1, 0.1);
     scene.children[1].children.forEach(function(planet){
             var color = (planet.player == "human") ? 0x00FF00 : 0xFFFF00;
-            var mat   = new THREE.MeshLambertMaterial({color: color});
+            var mat   = new THREE.MeshPhongMaterial({color: color});
             var cube = new THREE.Mesh(visu.spaceship.geometry, mat);
             cube.scale.set(0.08,0.08,0.08);
             cube.position.copy(planet.position);
