@@ -99,8 +99,10 @@ main.OnKeyDown = function(event) {
             unit.material.color.setHex(unit.originalColor);
         });
         main.selectedUnits = [];
-        if (main.gameOver)
+        if (main.gameOver) {
             main.Init();
+            main.OnResize();
+        }
     }
 }
 
