@@ -3,13 +3,15 @@ var visu = {};
 visu.Init = function(scene, pickingScene) {
     planetNormalMap = THREE.ImageUtils.loadTexture("img/rockNorm.jpg");
     var loader = new THREE.ColladaLoader();
+    var cubes = new THREE.Object3D();
+    var planets = new THREE.Object3D();
     loader.load("./spaceship.dae", function (collada){
         visu.spaceship = collada.scene.children[2].children[0];
         visu.spaceship.geometry.applyMatrix(new THREE.Matrix4().makeRotationX(-Math.PI/2));
-        visu.InitPlanets(scene, pickingScene);
+        visu.InitPlanets(scene, pickingScene, cubes, planets);
     });
     var geom = new THREE.BoxGeometry(0.1, 0.1, 0.1);
-    cubes = new THREE.Object3D();
+    
     
     scene.add(cubes); // scene.children[0]
     for (var i = 0; i < 0; ++i) {
@@ -20,9 +22,8 @@ visu.Init = function(scene, pickingScene) {
         cube.rotation.z = Math.random() * 3;
         cubes.add(cube);
     }      
-    planets = new THREE.Object3D();
+    
     scene.add(planets); // scene.children[1]
-    pickingPlanets = new THREE.Object3D();
 
     var geometry = new THREE.SphereGeometry(1, 10, 10);
     var material = new THREE.MeshBasicMaterial({
@@ -54,7 +55,7 @@ visu.Init = function(scene, pickingScene) {
     scene.add(light);
 }
 
-visu.InitPlanets = function(scene, pickingScene){
+visu.InitPlanets = function(scene, pickingScene, cubes, planets){
     for (var i=0; i<10; ++i) {
         var planetSize = 0.5;
         var planetColor = "red";

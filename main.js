@@ -38,7 +38,6 @@ main.Init = function() {
     main.selectedPlanet;
     main.selectedUnits = [];
     main.dontDrag = true;
-    main.gameOver = false;
 
     main.controls = new THREE.TrackballControls(main.camera, main.renderer.domElement);
     main.controls.rotateSpeed = 2.0;
@@ -48,6 +47,7 @@ main.Init = function() {
     main.controls.keys = [ 0, 83, 65, 68 ];
 
     $("#btnFullscr").click(main.OnFullscr);
+    $("#btnRestart").click(main.Init);
     $(window).resize($.throttle(300, main.OnResize));
     $(document).mousemove($.throttle(30, main.OnMouseMove));
     $(document).mousedown(main.OnMouseDown);
@@ -59,6 +59,8 @@ main.Init = function() {
     phys.Init(main.scene.children[0], main.scene.children[1]);
     enem.Init(main.scene.children[0], main.scene.children[1]);
     main.Animate();
+    if(main.spawnTime && !main.gameOver)main.clearInterval(main.spawnTime);
+    main.gameOver = false;
     main.spawnTime = window.setInterval(function(){
         if (main.IsEnd()) {
             clearInterval(main.spawnTime);
@@ -199,6 +201,7 @@ main.OnResize = function() {
     main.renderer.setSize(main.width, main.height);
     main.controls.handleResize();
 }
+
 
 main.Render = function() {
     main.scene.children[1].children.forEach(function(planet) {
