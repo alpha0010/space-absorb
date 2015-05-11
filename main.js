@@ -38,6 +38,7 @@ main.Init = function() {
     main.selectedPlanet;
     main.selectedUnits = [];
     main.dontDrag = true;
+    main.gameOver = false;
 
     main.controls = new THREE.TrackballControls(main.camera, main.renderer.domElement);
     main.controls.rotateSpeed = 2.0;
@@ -48,7 +49,7 @@ main.Init = function() {
 
     $("#btnFullscr").click(main.OnFullscr);
     $(window).resize($.throttle(300, main.OnResize));
-    $(document).mousemove(main.OnMouseMove);
+    $(document).mousemove($.throttle(30, main.OnMouseMove));
     $(document).mousedown(main.OnMouseDown);
     $(document).mouseup(main.OnMouseUp);
     $(document).keydown(main.OnKeyDown);
@@ -57,10 +58,34 @@ main.Init = function() {
     visu.Init(main.scene, main.pickingScene);
     phys.Init(main.scene.children[0], main.scene.children[1]);
     enem.Init(main.scene.children[0], main.scene.children[1]);
-    main.Animate();  
-    window.setInterval(function(){visu.AddUnits(main.scene)},2000);
-    // alternate phys update line
-    //window.setInterval(function(){phys.Update(main.clock.getDelta())},30);
+    main.Animate();
+    main.spawnTime = window.setInterval(function(){
+        if (main.IsEnd()) {
+            clearInterval(main.spawnTime);
+            return;
+        }
+        visu.AddUnits(main.scene);
+    }, 2000);
+}
+
+main.IsEnd = function() {
+    var planets = main.scene.children[1].children;
+    for (var i = 1; i < planets.length; ++i) {
+        if (planets[i-1].player != planets[i].player)
+            return false;
+    }
+    var units = main.scene.children[0].children;
+    for (var i = 1; i < units.length; ++i) {
+        if (units[i-1].player != units[i].player)
+            return false;
+    }
+
+    if (planets[0].player == "human")
+        visu.DrawText(["Victory", "press <space>"], main.scene);
+    else
+        visu.DrawText(["Game Over", "press <space>"], main.scene);
+    main.gameOver = true;
+    return true;
 }
 
 main.OnFullscr = function() {
@@ -74,6 +99,8 @@ main.OnKeyDown = function(event) {
             unit.material.color.setHex(unit.originalColor);
         });
         main.selectedUnits = [];
+        if (main.gameOver)
+            main.Init();
     }
 }
 
@@ -102,9 +129,7 @@ main.OnMouseMove = function(event) {
     main.mouseCopy = main.mouse.clone();
     main.dontDrag = main.mouse.distanceTo(main.mouseOrig) < 0.05 && main.dontDrag;
     main.mouse.unproject(main.camera);
-    
-    
-    
+
     if (!main.mouseDown) {
         main.raycaster.set(main.camera.position, main.mouse.sub(main.camera.position).normalize());
         var intersects = main.raycaster.intersectObjects(main.pickingScene.children);

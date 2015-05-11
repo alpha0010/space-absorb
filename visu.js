@@ -8,7 +8,7 @@ visu.Init = function(scene, pickingScene) {
         visu.spaceship.geometry.applyMatrix(new THREE.Matrix4().makeRotationX(-Math.PI/2));
         //visu.speceship.scale.set(0.1,0.1,0.1);
         visu.InitPlanets(scene, pickingScene);
-    })
+    });
     var geom = new THREE.BoxGeometry(0.1, 0.1, 0.1);
     cubes = new THREE.Object3D();
     
@@ -101,4 +101,25 @@ visu.AddUnits = function(scene) {
             scene.children[0].add(cube);
             phys.GoTo([cube], planet.position);
     });
-};
+}
+
+visu.DrawText = function(strs, scene) {
+    var canv = document.createElement("canvas");
+    canv.width  = 1024;
+    canv.height = 512;
+    var ctx  = canv.getContext("2d");
+    ctx.font = "Bold 100px Georgia";
+    ctx.fillStyle = "rgb(200,200,200)";
+    for (var i = 0; i < strs.length; ++i)
+        ctx.fillText(strs[i], 0, 100 + 110*i);
+    var texture = new THREE.Texture(canv);
+    texture.needsUpdate = true;
+    var mat = new THREE.SpriteMaterial({
+        map: texture,
+        useScreenCoordinates: false
+    });
+    var sprite = new THREE.Sprite(mat);
+	sprite.scale.set(8, 4, 1.0);
+	sprite.position.set(0, 0, 0);
+    scene.add(sprite);
+}
