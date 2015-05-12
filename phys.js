@@ -1,3 +1,8 @@
+/* phys.js handles how ships move and die.
+Micah Ng and Daniel Dehoog 
+For final project of CS 352 at Calvin college
+*/
+
 var phys = {};
 
 phys.Init = function(unitGroup, planetGroup) {

@@ -1,3 +1,8 @@
+/* enem.js handles basic AI for the ennemy ships
+Micah Ng and Daniel Dehoog 
+For final project of CS 352 at Calvin college
+*/
+
 var enem = {};
 
 enem.Init = function(unitGroup, planetGroup) {

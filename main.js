@@ -1,3 +1,9 @@
+/* main.js handles the primary game setup and the UI
+Micah Ng and Daniel Dehoog 
+For final project of CS 352 at Calvin college
+*/
+
+
 $(document).ready(function() {
     main.Init();
 });

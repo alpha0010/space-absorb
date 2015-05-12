@@ -1,3 +1,8 @@
+/* visu.js handles creating objects and adding them to the scene.
+Micah Ng and Daniel Dehoog 
+For final project of CS 352 at Calvin college
+*/
+
 var visu = {};
 
 visu.Init = function(scene, pickingScene) {
