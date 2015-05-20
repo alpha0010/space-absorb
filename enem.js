@@ -59,6 +59,11 @@ enem.Update = function(delta) {
         }
     }
 
+    if (targStrength == 9000) {
+        enem.Patrol();
+        return;
+    }
+
     targStrength    = Math.floor(targStrength * 1.9) + 15;
     var ownStrength = 0;
     for (var i = 0; i < objs.length; ++i) {
@@ -80,4 +85,15 @@ enem.Update = function(delta) {
             }
         }
     }
+}
+
+enem.Patrol = function() {
+    var planets = enem.planetGrp.children;
+    var destPl  = planets[Math.floor(Math.random() * planets.length)];
+    var objs = enem.objGrp.children;
+    for (var i = 0; i < objs.length; ++i) {
+        if (Math.random() < 0.1 && objs[i].player != "human")
+            objs[i].dest = destPl.position;
+    }
+    enem.lastAct -= 5;
 }
